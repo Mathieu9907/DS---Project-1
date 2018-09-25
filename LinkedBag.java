@@ -88,6 +88,21 @@ public class LinkedBag<T> extends ResizableArrayBag<T> implements BagInterface<T
 	   return result;
 	}
 
+
+	public int intersection(LinkedBag<T> other) {
+		int intersection = 0;
+		
+		for (Node currentNode = firstNode; currentNode != null; currentNode = currentNode.next) {
+			if (other.contains(currentNode.data)) {
+				intersection++;
+				other.remove(currentNode.data);
+			}
+		}
+		return intersection;
+	}
+	
+	
+	
 	private class Node {
 	    private T data;
 	    private Node next;
