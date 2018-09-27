@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class GuessingGame {
 
-	public static LBag<Integer> createArray(int numberOfIntegers, int rangeLimit) {
+	public static LBag<Integer> createBag(int numberOfIntegers, int rangeLimit) {
 		LBag<Integer> arr = new LBag<>();
 		
 		for (int i = 0; i < numberOfIntegers; i++) {
@@ -19,22 +19,19 @@ public class GuessingGame {
 		return arr;
 	}
 	
-	public static LBag<Integer> convertToIntArray(String str) {
+	public static LBag<Integer> convertToIntBag(String str) {
 		LBag<Integer> intBag = new LBag<>();
-		int lastPostSpaceIndex = 0;
+		String[] strArray = str.split(" ");
 		
-		for (int i = 0; i < str.length(); i++) {
-			if (str.charAt(i) == ' ') {
-				intBag.add(Integer.parseInt(str.substring(lastPostSpaceIndex, i - 1)));
-				if (i + 1 < str.length()) {
-					lastPostSpaceIndex = i + 1;
-				}
-			}
+		for (int i = 0; i < strArray.length; i++) {
+			intBag.add(Integer.parseInt(strArray[i]));
 		}
 		
 		return intBag;
 	}
 	
+	/*
+	@SuppressWarnings("resource")
 	public static ArrayList<LBag<Integer>> startGame(Scanner input) {
 		input = new Scanner(System.in);
 		ArrayList<LBag<Integer>> solutionAndGuessBag = new ArrayList<>();
@@ -46,7 +43,8 @@ public class GuessingGame {
 		
 		LBag<Integer> solutionBag = createArray(numberOfIntegers, rangeLimit);
 		
-		System.out.println("Enter 4 integers in the range 1 to " + rangeLimit + ". Entries may be duplicate.");
+		System.out.println("Enter " + numberOfIntegers
+				+ " integers in the range 1 to " + rangeLimit + ". Entries may be duplicate.");
 		String guess = input.next();
 		LBag<Integer> guessBag = convertToIntArray(guess);
 		
@@ -55,32 +53,61 @@ public class GuessingGame {
 		
 		return solutionAndGuessBag;
 	}
+	*/
 	
 	@SuppressWarnings("unlikely-arg-type")
 	public static void main(String[] args) {
 		
 		Scanner input = new Scanner(System.in);
 		
-		ArrayList<LBag<Integer>> solutionAndGuessBag = startGame(input);
-		LBag<Integer> solutionBag = solutionAndGuessBag.get(0);
-		LBag<Integer> guessBag = solutionAndGuessBag.get(1);
 		
 		int intersectVal;
 		
 		do {
-			intersectVal = solutionBag.intersection(guessBag);
-			if (intersectVal == 4) {
-				System.out.println("Well done! Play again?");
-				if (input.equals("Yes")) {
-					startGame(input);
+			System.out.print("How many integers would you like to guess? ");
+			int numberOfIntegers = input.nextInt();
+			System.out.print("What should the range of each integer be (1 to n)?\n\tn = ");
+			int rangeLimit = input.nextInt();
+			
+			LBag<Integer> solutionBag = createBag(numberOfIntegers, rangeLimit);
+			LBag<Integer> guessBag;
+			int numberOfMatches;
+			
+			String newLineCleaner = input.nextLine(); // removes "new line" symbol
+			
+			do {
+				System.out.printf("Enter " + numberOfIntegers
+						+ " integer%s in the range 1 to " + rangeLimit + ". Entries may be duplicate.%n",
+						numberOfIntegers > 1 ? "s" : "");
+				
+				String guess = input.nextLine();
+				guessBag = convertToIntBag(guess);
+				
+				while (guessBag.getCurrentSize() > solutionBag.getCurrentSize()) {
+					System.out.println("Too many numbers in guess!");
+					guess = input.nextLine();
+					guessBag = convertToIntBag(guess);
 				}
-				System.exit(0);
+			    numberOfMatches = solutionBag.intersection(guessBag);
+			    
+				if (numberOfMatches < numberOfIntegers)
+					System.out.println(numberOfMatches + " of your guesses are correct.");
+
+			} while (numberOfMatches < numberOfIntegers);
+			
+			System.out.print("Congrats! The right combination was ");
+			
+			Object[] solutionArray = solutionBag.toArray();
+			
+			for (int i = 0 ; i < solutionBag.getCurrentSize() ; i++) {
+				System.out.print(solutionArray[i] + " ");
 			}
-			else {
-				System.out.println(intersectVal + " of your guesses are correct. Guess again");
-			}
-		} while (!input.equals("quit"));
+			
+			System.out.print("\nPlay again? ");
+			
+		} while (input.nextLine().equalsIgnoreCase("Yes"));
 		
+		System.exit(0);
 		
 		
 		
